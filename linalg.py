@@ -7,7 +7,7 @@ def print_matrix(matrix):
     for row in matrix:
         print('|', end='')
         for element in row:
-            print(element, end=' ')
+            print('{:.1f}'.format(element) if element else '0.0', end=' ')
         print('|')
 
 def input_matrix(size=(0,0)):
@@ -19,10 +19,23 @@ def input_matrix(size=(0,0)):
     print('Input the elements of the martix in order')
     nums = []
     while len(nums) < size[0]*size[1]:
-        nums.extend([int(num) for num in re.findall(r'-?\d+', input())])
+        nums.extend([float(num) for num in re.findall(r'-?\d+\.?\d*', input())])
     # returns 2D list representing matrix
     return [nums[size[1]*row:size[1]*(row+1)] for row in range(size[0])]
+   
+def product(left, right):
+    '''Multiply two matrices'''
+    # check that the matrices are able to be multiplied
+    assert len(left[0]) == len(right)
     
+    matrix = [[0 for i in range(len(right[0]))] for j in range(len(left))]
+    for i in range(len(matrix)):
+        for j in range(len(matrix[0])):
+            for k in range(len(right)):
+                matrix[i][j] += left[i][k]*right[k][j]
+    
+    return matrix
+
 def determinant(matrix, minor_row=None, minor_col=None):
     '''Recursively calculate determinant based on expansion by cofactors on the first column'''
     # make sure matrix is square 
@@ -42,9 +55,19 @@ def determinant(matrix, minor_row=None, minor_col=None):
     sum = 0
     for ind, row in enumerate(matrix):
         sum += (-1 if ind%2 else 1)*row[0]*determinant(deepcopy(matrix), ind, 0)
-        print(sum)
     return sum
 
+def inverse(matrix):
+    '''Calculates inverse using determinant'''
+    det = determinant(matrix)
+   
+    # check invertability
+    assert det != 0
+    
+    # return the inverse based on the cofactor/determinant
+    return [[(-1 if (row+col)%2 else 1)*determinant(deepcopy(matrix), row, col)/det for row in range(len(matrix))] for col in range(len(matrix))]
+
 if __name__ == '__main__':
-    # calculate determinant
-    print(determinant(input_matrix()))
+    # demonstrate all methods
+    mat = input_matrix()
+    print_matrix(product(mat, inverse(mat)))
