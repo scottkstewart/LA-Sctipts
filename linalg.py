@@ -10,13 +10,13 @@ def print_matrix(matrix):
             print('{:.1f}'.format(element) if element else '0.0', end=' ')
         print('|')
 
-def input_matrix(size=(0,0)):
+def input_matrix(size=(0,0), prompt='Input the elements of the matrix in order'):
     '''Input a matrix, prompting for size if necessary''' 
     if not size[0]:
         size = [int(num) for num in re.split('\D', input('What size is the matrix?\n'))]
     
     # finds elements sequentially
-    print('Input the elements of the martix in order')
+    print(prompt)
     nums = []
     while len(nums) < size[0]*size[1]:
         nums.extend([float(num) for num in re.findall(r'-?\d+\.?\d*', input())])
@@ -27,13 +27,13 @@ def product(left, right):
     '''Multiply two matrices'''
     # check that the matrices are able to be multiplied
     assert len(left[0]) == len(right)
-    
-    matrix = [[0 for i in range(len(right[0]))] for j in range(len(left))]
+
+    matrix = [[0 for j in range(len(right[0]))] for i in range(len(left))]
     for i in range(len(matrix)):
         for j in range(len(matrix[0])):
             for k in range(len(right)):
                 matrix[i][j] += left[i][k]*right[k][j]
-    
+
     return matrix
 
 def determinant(matrix, minor_row=None, minor_col=None):
@@ -67,7 +67,12 @@ def inverse(matrix):
     # return the inverse based on the cofactor/determinant
     return [[(-1 if (row+col)%2 else 1)*determinant(deepcopy(matrix), row, col)/det for row in range(len(matrix))] for col in range(len(matrix))]
 
-if __name__ == '__main__':
-    # demonstrate all methods
-    mat = input_matrix()
-    print_matrix(product(mat, inverse(mat)))
+# separated for efficiency in case of several right vectors
+solve = lambda left, right: product(inverse(left), right)
+
+def linear_system():
+    '''Return the solution to a requested linear system of equations using multiplication by the inverse'''
+    size = [int(num) for num in re.split('\D', input('What size is the system? (equations x unknowns)\n'))]
+    left_equations = input_matrix(size, 'Input the coefficients for the left side of the system:')
+    right_equations = input_matrix((size[0], 1), 'Input the right side of the system:')
+    return solve(left_equations, right_equations)

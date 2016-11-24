@@ -6,4 +6,4 @@ setup(name='LA-scripts',
       author='Scott Stewart',
       url='https://github.com/scottkstewart/LA-Sctipts',
       author_email='scottkstewart16@gmail.com',
-      modules=['linalg'])
+      py_modules=['linalg'])
